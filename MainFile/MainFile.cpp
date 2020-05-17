@@ -4,7 +4,6 @@
 #include "framework.h"
 #include "MainFile.h"
 #include "shellapi.h"
-
 #define MAX_LOADSTRING 100
 _TCHAR* addres;
 int ll;
