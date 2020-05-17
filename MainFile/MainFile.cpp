@@ -12,16 +12,16 @@ POINT pt;
 int GetAddres(char Level)
 {
     _TCHAR tmp[200];
-    char Lev[] = "Debug\\Level1.exe";
-    Lev[11] = Level;
+    char Lev[] = "\\Level1.exe";
+    Lev[6] = Level;
     int len = GetCurrentDirectory(200, tmp);
     addres = new _TCHAR[len + 12];
-    for (int o = 0; o < len -8; o++)
+    for (int o = 0; o < len ; o++)
         addres[o] = tmp[o];
-    for (int i = 0; i < 17; i++)
-        addres[i + len - 8] = Lev[i];
+    for (int i = 0; i < 12; i++)
+        addres[i + len ] = Lev[i];
 
-    return len + 8;
+    return len + 12;
 
 }
 // Глобальные переменные:
@@ -201,7 +201,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             TextOut(hdc, 150, 300, _T("2. Level2. MULTIPLY and DIVIDE(* and /) operations(not ready)"), 61);
             TextOut(hdc, 150, 350, _T("3. Level3. Some EXPONENT (^) operations(not ready)"), 50);
             TextOut(hdc, 150, 400, _T("Future development"), 18);
-           // TextOut(hdc, 100, 100, addres, ll);
+            TextOut(hdc, 100, 100, addres, ll);
             // TODO: Добавьте сюда любой код прорисовки, использующий HDC...
             EndPaint(hWnd, &ps);
         }
