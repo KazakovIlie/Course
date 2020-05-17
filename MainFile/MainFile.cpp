@@ -170,26 +170,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
                 ShellExecute(hWnd, _T("open"), addres, NULL, NULL, SW_SHOW);
             }
-           /* if (pt.x > 849 && pt.x < 901 && pt.y>124 && pt.y < 151)
+            if (pt.x > 149 && pt.x < 151 + 47 * 8 && pt.y>299 && pt.y < 316)
             {
-                ll = GetAddres('1');
+                ll = GetAddres('2');
 
                 ShellExecute(hWnd, _T("open"), addres, NULL, NULL, SW_SHOW);
-            }*/
+            }
             InvalidateRect(hWnd, NULL, true);
         }
         break;
-    case WM_KEYDOWN:
-    {
-        switch (wParam)
-        {
-        case VK_F3:
-            
-
-            break;
-        }
-        break;
-    }
+    
     case WM_PAINT:
         {
             PAINTSTRUCT ps;
@@ -197,7 +187,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             TextOut(hdc, 150, 150, _T("Welcome to main menu!"), 21);
             TextOut(hdc, 150, 210, _T("Select Level you want to try by click"), 37);
             TextOut(hdc, 150, 250, _T("1. Level1. ADD and SUBTRACT(+ and -) operations"), 47);
-            TextOut(hdc, 150, 300, _T("2. Level2. MULTIPLY and DIVIDE(* and /) operations(not ready)"), 61);
+            TextOut(hdc, 150, 300, _T("2. Level2. MULTIPLY and DIVIDE(* and /) operations"), 61);
             TextOut(hdc, 150, 350, _T("3. Level3. Some EXPONENT (^) operations(not ready)"), 50);
             TextOut(hdc, 150, 400, _T("Future development"), 18);
             TextOut(hdc, 100, 100, addres, ll);
