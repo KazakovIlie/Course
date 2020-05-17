@@ -13,23 +13,7 @@ int rez = -1;
 bool help = 0;
 bool zn = 0;
 bool mode = 0;
-_TCHAR* addres;
-int ll;
-int GetAddres( char Level)
-{
-    _TCHAR tmp[200];
-    char Lev[] = "Debug\\Level1.exe";
-    Lev[11] = Level;
-    int len = GetCurrentDirectory(200, tmp);
-    addres = new _TCHAR[len + 12];
-    for (int o = 0; o < len-5; o++)
-        addres[o] = tmp[o];
-    for (int i = 0; i < 17; i++)
-        addres[i + len-5] = Lev[i];
 
-    return len + 11;
-   
-}
 int convi(int zn, _TCHAR* res)
 {
     char tool[10] = { " " };
@@ -419,12 +403,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case VK_F2:
             help = 1;      
             break;
-        case VK_F3:
-           ll = GetAddres('2');
-
-           ShellExecute(hWnd,_T("open"),addres, NULL, NULL, SW_SHOW);
-            
-            break;
+       
         } 
         InvalidateRect(hWnd, NULL, true);
     }
@@ -460,7 +439,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             TextOut(hdc, 50 ,60, _T("Press F2 to get help!"), 21);
             TextOut(hdc, 50, 5, _T("Use 0-9,-,+ to write your answer!"), 33);
             TextOut(hdc,300, 5, _T("Press BACKSPACE to erase your input!"), 36);
-            TextOut(hdc, 800,500, (_TCHAR*)addres, ll);
+           
             // TODO: Добавьте сюда любой код прорисовки, использующий HDC...
             EndPaint(hWnd, &ps);
         }

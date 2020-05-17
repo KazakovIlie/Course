@@ -20,11 +20,10 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{68205A7E-5441-4C8F-A1E9-8F963F5DC12F}</ProjectGuid>
+    <ProjectGuid>{78327182-3615-44B7-83A2-21B0917CDFEE}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>start</RootNamespace>
+    <RootNamespace>MainFile</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Level1</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -149,19 +148,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="MainFile.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="start.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="start.cpp" />
+    <ClCompile Include="MainFile.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="start.rc" />
+    <ResourceCompile Include="MainFile.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="MainFile.ico" />
     <Image Include="small.ico" />
-    <Image Include="start.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
