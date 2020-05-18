@@ -382,6 +382,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             int i = rand() % 6 + 2 + 2 * mode;
             int* mas = new int[i];
             char* ac = new char[i - 1];
+            mas[0] = rand() % (10 + 10 * mode) + 1 + 4 * mode;
+            _rez *= mas[0];
             for (int j = 0; j < i - 1; j++)
             {                
                 int act = rand() % 2;
@@ -394,26 +396,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 case 1: ac[j] = '/'; break;
                 }
                
-                if(j!=0 && ac[j-1]=='/')
+                if( ac[j]=='/')
                     do {
-                        mas[j] = rand() % (10 + 10 * mode) + 1 ;
+                        mas[j+1] = rand() % (10 + 10 * mode) + 1 ;
                        
-                    } while (_rez%mas[j] || _rez<mas[j]);
+                    } while (_rez%mas[j+1] || _rez<mas[j+1]);
                 else
                 {
-                    mas[j] = rand() % (10 + 10 * mode) + 1 + 4 * mode;
-                    _rez *= mas[j];
+                    mas[j + 1] = rand() % (10 + 10 * mode) + 1 + 4 * mode;
+                    _rez *= mas[j + 1];
                 }
-                if (ac[j - 1] == '/')
-                    _rez /= mas[j];
+                if (ac[j] == '/')
+                    _rez /= mas[j + 1];
             }
-            if ( ac[i - 2] == '/')
-                do {
-                    mas[i-1] = rand() % (10 + 10 * mode) + 1 ;
-
-                } while (_rez % mas[i-1] || _rez < mas[i-1]);
-            else              
-                mas[i - 1] = rand() % (10 + 10 * mode) + 1 + 4 * mode;
+            
             Level2 Second(mas, ac, i);
             First = Second;
             rez = -1;
