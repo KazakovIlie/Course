@@ -170,9 +170,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
                 ShellExecute(hWnd, _T("open"), addres, NULL, NULL, SW_SHOW);
             }
-            if (pt.x > 149 && pt.x < 151 + 47 * 8 && pt.y>299 && pt.y < 316)
+            if (pt.x > 149 && pt.x < 151 + 50 * 8 && pt.y>299 && pt.y < 316)
             {
                 ll = GetAddres('2');
+
+                ShellExecute(hWnd, _T("open"), addres, NULL, NULL, SW_SHOW);
+            }
+            if (pt.x > 149 && pt.x < 151 + 38 * 8 && pt.y>349 && pt.y < 366)
+            {
+                ll = GetAddres('3');
 
                 ShellExecute(hWnd, _T("open"), addres, NULL, NULL, SW_SHOW);
             }
@@ -187,8 +193,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             TextOut(hdc, 150, 150, _T("Welcome to main menu!"), 21);
             TextOut(hdc, 150, 210, _T("Select Level you want to try by click"), 37);
             TextOut(hdc, 150, 250, _T("1. Level1. ADD and SUBTRACT(+ and -) operations"), 47);
-            TextOut(hdc, 150, 300, _T("2. Level2. MULTIPLY and DIVIDE(* and /) operations"), 61);
-            TextOut(hdc, 150, 350, _T("3. Level3. Some EXPONENT (^) operations(not ready)"), 50);
+            TextOut(hdc, 150, 300, _T("2. Level2. MULTIPLY and DIVIDE(* and /) operations"), 50);
+            TextOut(hdc, 150, 350, _T("3. Level3. Some EXPONENT (^) operations"), 39);
             TextOut(hdc, 150, 400, _T("Future development"), 18);
             TextOut(hdc, 100, 100, addres, ll);
             // TODO: Добавьте сюда любой код прорисовки, использующий HDC...

@@ -1,8 +1,8 @@
-﻿// start.cpp : Определяет точку входа для приложения.
+﻿// Level3.cpp : Определяет точку входа для приложения.
 //
 
 #include "framework.h"
-#include "Level2.h"
+#include "Level3.h"
 #include <iostream>
 #include <chrono>
 #define MAX_LOADSTRING 100
@@ -12,7 +12,9 @@ int rez = -1;
 bool help = 0;
 bool zn = 0;
 bool mode = 0;
-
+bool calc = 0;
+_TCHAR mainstr[200] = { '3','^','0','+','1','^','1','+','9','^','0','+','6','^','0','=' };
+int msLen = _tcslen(mainstr);
 int convi(int zn, _TCHAR* res)
 {
     char tool[10] = { " " };
@@ -27,7 +29,24 @@ int convi(int zn, _TCHAR* res)
                 res[i] = '0';
     return l;
 }
-
+void crutches(int z, int k)
+{
+    _TCHAR tmp[10];
+    int l=convi(z, tmp);
+    for (int i = 0; i < l; i++)
+    {
+        mainstr[msLen] = tmp[i];
+        msLen++;
+    }
+    mainstr[msLen] = '^';
+    msLen ++;
+    l = convi(k, tmp);
+    for (int i = 0; i < l; i++)
+    {
+        mainstr[msLen] = tmp[i];
+        msLen++;
+    }
+}
 class Problem
 {
 public:
@@ -39,7 +58,7 @@ public:
     virtual void ShowStep() {};
     virtual ~Problem() {};
 };
-class Level2 : public Problem
+class Level3 : public Problem
 {
     int* Arguments;
     char* Actions;
@@ -49,7 +68,7 @@ class Level2 : public Problem
     _TCHAR numeric[200];
     int numericLen = 0;
 public:
-    Level2(int Arg[], char Act[], int count)
+    Level3(int Arg[], char Act[], int count)
     {
         Arguments = new int[count];
         Actions = new char[count];
@@ -67,20 +86,18 @@ public:
     {
         _TCHAR numC[10];
         numericLen = 0;
-        for (int i = 0; i <= pos; i++)
+        for (int i = 0; i < pos; i++)
         {
-            convi(Arguments[i], numC);
-            numeric[numericLen] = numC[0];
-            numericLen++;
-            if (Arguments[i] > 9)
+            int _len = convi(Arguments[i], numC);
+            for (int p = 0; p < _len; p++)
             {
-                numeric[numericLen] = numC[1];
+                numeric[numericLen] = numC[p];
                 numericLen++;
             }
             numeric[numericLen] = Actions[i];
             numericLen++;
         }
-        numeric[numericLen - 1] = '=';
+        numeric[numericLen-1] = '=';
     }
     void Resolve(int actCount) {
         int rez = 0;
@@ -89,8 +106,8 @@ public:
         {
 
             switch (Actions[i]) {
-            case '*': rez *= Arguments[i + 1]; break;
-            case '/': rez /= Arguments[i + 1]; break;
+            case '+': rez += Arguments[i + 1]; break;
+            case '-': rez -= Arguments[i + 1]; break;
             case '=': searchI = rez; convi(rez, searchC);  break;
             }
         }
@@ -103,18 +120,22 @@ public:
         else
             return 0;
     }
-    void DisplayProblem(HDC hdc) {
+    void DisplayProblem(HDC hdc) {        
+        TextOut(hdc, 100, 100, mainstr, msLen);
+
+    }
+    void DisplayHelp(HDC hdc) {
         convP(oCount);
-        TextOut(hdc, 100, 100, numeric, numericLen - 2);
+        TextOut(hdc, 100, 130, numeric, numericLen-1);
 
     }
     void ShowAnswer(HDC hdc) {
         ShowStep(hdc, oCount);
     }
     void ShowStep(HDC hdc, int pos) {
-        for (int i = 1; i < pos; i++)
+        for (int i = 2; i <= pos; i++)
         {
-            Resolve(i);
+            Resolve(i-1);
             convP(i);
             int _rez = searchI;
             int len = 0;
@@ -124,25 +145,24 @@ public:
             } while (_rez);
             if (searchI < 0)
                 len++;
-            TextOut(hdc, 100, 120 + i * 25, numeric, numericLen);
-            TextOut(hdc, 100 + numericLen * 8, 120 + i * 25, searchC, len);
+            TextOut(hdc, 100, 155 + (i-1) * 25, numeric, numericLen);
+            TextOut(hdc, 100 + numericLen * 8, 155 + (i-1) * 25, searchC, len);
         }
     }
     int getArg(int n) { return Arguments[n]; }
     int getAct(int n) { return Actions[n]; }
     int getLEn() { return numericLen; }
-    Level2& operator=(Level2& other);
+    Level3& operator=(Level3& other);
     void Progress() {}
     //~Level1() { }
 };
-Level2& Level2::operator=(Level2& another) { //присваивание
+Level3& Level3::operator=(Level3& another) { //присваивание
     if (this == &another)
         return *this;
     Arguments = another.Arguments;
     Actions = another.Actions;
     oCount = another.oCount;
 }
-
 // Глобальные переменные:
 HINSTANCE hInst;                                // текущий экземпляр
 WCHAR szTitle[MAX_LOADSTRING];                  // Текст строки заголовка
@@ -155,9 +175,9 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-    _In_opt_ HINSTANCE hPrevInstance,
-    _In_ LPWSTR    lpCmdLine,
-    _In_ int       nCmdShow)
+                     _In_opt_ HINSTANCE hPrevInstance,
+                     _In_ LPWSTR    lpCmdLine,
+                     _In_ int       nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
@@ -166,16 +186,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     // Инициализация глобальных строк
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    LoadStringW(hInstance, IDC_LEVEL2, szWindowClass, MAX_LOADSTRING);
+    LoadStringW(hInstance, IDC_LEVEL3, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
 
     // Выполнить инициализацию приложения:
-    if (!InitInstance(hInstance, nCmdShow))
+    if (!InitInstance (hInstance, nCmdShow))
     {
         return FALSE;
     }
 
-    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_LEVEL2));
+    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_LEVEL3));
 
     MSG msg;
 
@@ -189,7 +209,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
     }
 
-    return (int)msg.wParam;
+    return (int) msg.wParam;
 }
 
 
@@ -205,17 +225,17 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
     wcex.cbSize = sizeof(WNDCLASSEX);
 
-    wcex.style = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc = WndProc;
-    wcex.cbClsExtra = 0;
-    wcex.cbWndExtra = 0;
-    wcex.hInstance = hInstance;
-    wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_LEVEL2));
-    wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_LEVEL2);
-    wcex.lpszClassName = szWindowClass;
-    wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+    wcex.style          = CS_HREDRAW | CS_VREDRAW;
+    wcex.lpfnWndProc    = WndProc;
+    wcex.cbClsExtra     = 0;
+    wcex.cbWndExtra     = 0;
+    wcex.hInstance      = hInstance;
+    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_LEVEL3));
+    wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
+    wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
+    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_LEVEL3);
+    wcex.lpszClassName  = szWindowClass;
+    wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
     return RegisterClassExW(&wcex);
 }
@@ -232,20 +252,20 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-    hInst = hInstance; // Сохранить маркер экземпляра в глобальной переменной
+   hInst = hInstance; // Сохранить маркер экземпляра в глобальной переменной
 
-    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
-    if (!hWnd)
-    {
-        return FALSE;
-    }
+   if (!hWnd)
+   {
+      return FALSE;
+   }
 
-    ShowWindow(hWnd, nCmdShow);
-    UpdateWindow(hWnd);
+   ShowWindow(hWnd, nCmdShow);
+   UpdateWindow(hWnd);
 
-    return TRUE;
+   return TRUE;
 }
 
 //
@@ -258,9 +278,10 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - отправить сообщение о выходе и вернуться
 //
 //
+
 int mass[5] = { 1,1,1,1 };
-char str[4] = { '*','/','*' };
-Level2 First(mass, str, 4);
+char str[4] = { '+','+','+' };
+Level3 First(mass, str, 4);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     srand(time(NULL));
@@ -377,44 +398,39 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
         case VK_SPACE:
         {
-            int _rez = 1;
+            msLen = 0;           
+            int k = rand() % (9 + mode * 21) + 1;
+            int n = rand() % (4 + (k < 11) * mode * 2);
             int i = rand() % 6 + 2 + 2 * mode;
+            crutches(k, n);
             int* mas = new int[i];
             char* ac = new char[i - 1];
-            mas[0] = rand() % (10 + 10 * mode) + 1 + 4 * mode;
-            _rez *= mas[0];
+            mas[0] = pow(k, n);
             for (int j = 0; j < i - 1; j++)
-            {                
+            {
+                k = rand() % (9 + mode * 21) + 1;
+                n = rand() % (4 + (k < 11) * mode * 2);
+
                 int act = rand() % 2;
-                if (_rez == 1)
-                    act = 0;
-                if (_rez > 500)
-                    act = 1;
                 switch (act) {
-                case 0: ac[j] = '*'; break;
-                case 1: ac[j] = '/'; break;
+                case 0: ac[j] = '+'; break;
+                case 1: ac[j] = '-'; break;
                 }
-               
-                if( ac[j]=='/')
-                    do {
-                        mas[j+1] = rand() % (10 + 10 * mode) + 1 ;
-                       
-                    } while (_rez%mas[j+1] || _rez<mas[j+1]);
-                else
-                {
-                    mas[j + 1] = rand() % (10 + 10 * mode) + 1 + 4 * mode;
-                    _rez *= mas[j + 1];
-                }
-                if (ac[j] == '/')
-                    _rez /= mas[j + 1];
+                mainstr[msLen] = ac[j];
+                msLen++;
+                mas[j + 1] = pow(k, n);
+                crutches(k, n);
+
             }
-            
-            Level2 Second(mas, ac, i);
+            mainstr[msLen] = '=';
+            msLen++;
+            Level3 Second(mas, ac, i);
             First = Second;
             rez = -1;
             help = 0;
             curEnt = 0;
             zn = 0;
+            calc = 0;
             InvalidateRect(hWnd, NULL, true);
         }
         break;
@@ -422,6 +438,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             help = 1;
             break;
 
+
+        case VK_F3:
+            help = 1;
+            calc = 1;
+            break;
         }
         InvalidateRect(hWnd, NULL, true);
     }
@@ -439,22 +460,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         Rectangle(hdc, 800 + 50 * (int)mode, 125, 850 + 50 * (int)mode, 150);
         DeleteObject(hBrush);
         First.DisplayProblem(hdc);
-        if (help)
-            First.ShowAnswer(hdc);
+        if (help) {
+            First.DisplayHelp(hdc);
+            if (calc)
+                First.ShowAnswer(hdc);
+        }
         _TCHAR tmp[10];
         int tmpLen = convi(curEnt, tmp);
         if (zn)
-            TextOut(hdc, 100 + First.getLEn() * 8, 100, _T("-"), 1);
-        TextOut(hdc, 108 + First.getLEn() * 8, 100, tmp, tmpLen);
+            TextOut(hdc, 100 + msLen * 8, 100, _T("-"), 1);
+        TextOut(hdc, 108 + msLen * 8, 100, tmp, tmpLen);
         if (rez == 1)
-            TextOut(hdc, 100 + First.getLEn() * 8 + 55, 100, _T("Accepted!"), 9);
+            TextOut(hdc, 100 + msLen * 8 + 55, 100, _T("Accepted!"), 9);
         else
             if (rez == 0)
-                TextOut(hdc, 100 + First.getLEn() * 8 + 85, 100, _T("False!"), 6);
+                TextOut(hdc, 100 + msLen * 8 + 85, 100, _T("False!"), 6);
             else
-                TextOut(hdc, 100 + First.getLEn() * 8 + 85, 100, _T("Press ENTER to check your answer!"), 33);
+                TextOut(hdc, 100 + msLen * 8 + 85, 100, _T("Press ENTER to check your answer!"), 33);
         TextOut(hdc, 50, 30, _T("Press SPACE to get another example!"), 35);
-        TextOut(hdc, 50, 60, _T("Press F2 to get help!"), 21);
+        TextOut(hdc, 50, 60, _T("Press F2 to check your exponent calculations!"), 45);
+        TextOut(hdc, 50+45*8, 60, _T("Press F3 to get major help!"), 27);
         TextOut(hdc, 50, 5, _T("Use 0-9,-,+ to write your answer!"), 33);
         TextOut(hdc, 300, 5, _T("Press BACKSPACE to erase your input!"), 36);
 
