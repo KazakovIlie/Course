@@ -387,7 +387,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 int act = rand() % 2;
                 if (_rez == 1)
                     act = 0;
-                if (_rez > 1000)
+                if (_rez > 500)
                     act = 1;
                 switch (act) {
                 case 0: ac[j] = '*'; break;
