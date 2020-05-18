@@ -399,8 +399,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case VK_SPACE:
         {
             msLen = 0;           
-            int k = rand() % (9 + mode * 21) + 1;
-            int n = rand() % (4 + (k < 11) * mode * 2);
+            int k = rand() % (15 + mode * 25) + 1;
+            int n = rand() % (3 + (k < 16) * mode  + (k<11) );
             int i = rand() % 6 + 2 + 2 * mode;
             crutches(k, n);
             int* mas = new int[i];
@@ -408,8 +408,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             mas[0] = pow(k, n);
             for (int j = 0; j < i - 1; j++)
             {
-                k = rand() % (9 + mode * 21) + 1;
-                n = rand() % (4 + (k < 11) * mode * 2);
+                k = rand() % (15 + mode * 25) + 1;
+                n = rand() % (3 + (k < 16) * mode  + (k < 11) );
 
                 int act = rand() % 2;
                 switch (act) {
