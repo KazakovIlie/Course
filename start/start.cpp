@@ -50,92 +50,97 @@ class Level1 : public Problem
     _TCHAR numeric[200];
     int numericLen = 0;
 public:
-    Level1(int Arg[],char Act[], int count) 
-    { 
-        Arguments = new int[count];
-        Actions = new char[count];
-        oCount = count;
-        for (int i = 0; i < count; i++)
-        {
-            Arguments[i] = Arg[i];
-            if (i != count - 1)
-                Actions[i] = Act[i];
-            else
-                Actions[i] = '=';
-        }
-    }
-    void convP(int pos)
-    {       
-        _TCHAR numC[10];
-        numericLen = 0;
-        for (int i = 0; i <= pos; i++)
-        {
-            convi(Arguments[i], numC);
-            numeric[numericLen] = numC[0];
-            numericLen++;
-            if (Arguments[i] > 9)
-            {
-                numeric[numericLen] = numC[1];
-                numericLen++;
-            }
-            numeric[numericLen] = Actions[i];
-            numericLen++;
-        }
-        numeric[numericLen-1] = '=';
-    }
-    void Resolve(int actCount) {
-        int rez = 0;
-        rez = Arguments[0];
-        for (int i = 0; i < actCount; i++)
-        {
-            
-            switch (Actions[i]) {
-                case '+': rez += Arguments[i+1]; break;
-                case '-': rez -= Arguments[i+1]; break;
-                case '=': searchI = rez; convi(rez, searchC);  break;
-            }
-        }
-        searchI = rez; convi(rez, searchC);
-    }
-    bool AnswerCheck(int zn) {
-        Resolve(oCount);
-        if (searchI == zn)
-            return 1;
-        else
-            return 0;
-    }
-    void DisplayProblem(HDC hdc) {        
-        convP(oCount);
-        TextOut(hdc, 100, 100, numeric, numericLen-2);   
-        
-    }
-    void ShowAnswer(HDC hdc) {
-        ShowStep(hdc, oCount);
-    }
-    void ShowStep(HDC hdc, int pos) {
-        for (int i = 1; i < pos; i++)
-        {
-            Resolve(i);
-            convP(i);
-            int _rez = searchI;
-            int len = 0;
-            do {
-                len++;
-                _rez /= 10;
-            } while (_rez);
-            if (searchI < 0)
-                len++;
-            TextOut(hdc, 100, 120 + i * 25, numeric, numericLen );
-            TextOut(hdc, 100 + numericLen * 8, 120 + i * 25, searchC, len);
-        }
-    }
+    Level1(int Arg[], char Act[], int count);
+    void convP(int pos);
+    void Resolve(int actCount);
+    bool AnswerCheck(int zn);
+    void DisplayProblem(HDC hdc);
+    void ShowAnswer(HDC hdc);
+    void ShowStep(HDC hdc, int pos);
     int getArg(int n) { return Arguments[n]; }
     int getAct(int n) { return Actions[n]; }
     int getLEn() { return numericLen; }
-    Level1& operator=(Level1& other);    
-    void Progress() {}
-    //~Level1() { }
+    Level1& operator=(Level1& other);      
 };
+Level1::Level1(int Arg[], char Act[], int count) {
+    Arguments = new int[count];
+    Actions = new char[count];
+    oCount = count;
+    for (int i = 0; i < count; i++)
+    {
+        Arguments[i] = Arg[i];
+        if (i != count - 1)
+            Actions[i] = Act[i];
+        else
+            Actions[i] = '=';
+    }
+}
+void Level1::convP(int pos) {
+    _TCHAR numC[10];
+    numericLen = 0;
+    for (int i = 0; i <= pos; i++)
+    {
+        convi(Arguments[i], numC);
+        numeric[numericLen] = numC[0];
+        numericLen++;
+        if (Arguments[i] > 9)
+        {
+            numeric[numericLen] = numC[1];
+            numericLen++;
+        }
+        numeric[numericLen] = Actions[i];
+        numericLen++;
+    }
+    numeric[numericLen - 1] = '=';
+
+
+}
+void Level1::Resolve(int actCount) {
+    int rez = 0;
+    rez = Arguments[0];
+    for (int i = 0; i < actCount; i++)
+    {
+
+        switch (Actions[i]) {
+        case '+': rez += Arguments[i + 1]; break;
+        case '-': rez -= Arguments[i + 1]; break;
+        case '=': searchI = rez; convi(rez, searchC);  break;
+        }
+    }
+    searchI = rez; convi(rez, searchC);
+}
+bool Level1::AnswerCheck(int zn) {
+    Resolve(oCount);
+    if (searchI == zn)
+        return 1;
+    else
+        return 0;
+}
+void Level1::DisplayProblem(HDC hdc) {
+    convP(oCount);
+    TextOut(hdc, 100, 100, numeric, numericLen - 2);
+
+}
+void Level1::ShowAnswer(HDC hdc) {
+    ShowStep(hdc, oCount);
+}
+void Level1::ShowStep(HDC hdc, int pos) {
+    for (int i = 1; i < pos; i++)
+    {
+        Resolve(i);
+        convP(i);
+        int _rez = searchI;
+        int len = 0;
+        do {
+            len++;
+            _rez /= 10;
+        } while (_rez);
+        if (searchI < 0)
+            len++;
+        TextOut(hdc, 100, 120 + i * 25, numeric, numericLen);
+        TextOut(hdc, 100 + numericLen * 8, 120 + i * 25, searchC, len);
+    }
+}
 Level1& Level1::operator=(Level1& another) { //присваивание
     if (this == &another)
         return *this;

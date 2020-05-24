@@ -399,7 +399,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     do {
                         mas[j+1] = rand() % (10 + 10 * mode) + 1 ;
                        
-                    } while (_rez%mas[j+1] || _rez<mas[j+1]);
+                    } while (_rez%mas[j+1] || _rez<mas[j+1] || (rez>500 && mas[j+1]==1));
                 else
                 {
                     mas[j + 1] = rand() % (10 + 10 * mode) + 1 + 4 * mode;
