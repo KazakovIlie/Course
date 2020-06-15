@@ -6,6 +6,8 @@
 #include <iostream>
 #include <chrono>
 #include <shellapi.h>
+#include <list>
+#include <string>
 #define MAX_LOADSTRING 100
 POINT pt;
 int curEnt = 0;
@@ -29,6 +31,22 @@ int convi(int zn, _TCHAR* res)
     return l;
 }
 
+class IObserver {
+public:
+    virtual ~IObserver() {};
+    virtual void Update(const std::string& message_from_subject) = 0;
+};
+
+class ISubject {
+public:
+    virtual ~ISubject() {};
+    virtual void Attach(IObserver* observer) = 0;
+    virtual void Detach(IObserver* observer) = 0;
+    virtual void Notify() = 0;
+};
+
+
+
 class Problem
 {
     public:
@@ -40,7 +58,7 @@ class Problem
         virtual void ShowStep() {};
         virtual ~Problem() {};
 };
-class Level1 : public Problem
+class Level1 : public Problem , public ISubject
 {
     int* Arguments;
     char* Actions;
@@ -49,6 +67,8 @@ class Level1 : public Problem
     int searchI;
     _TCHAR numeric[200];
     int numericLen = 0;
+    std::list<IObserver*> list_observer_;
+    std::string message_;
 public:
     Level1(int Arg[], char Act[], int count);
     void convP(int pos);
@@ -60,7 +80,29 @@ public:
     int getArg(int n) { return Arguments[n]; }
     int getAct(int n) { return Actions[n]; }
     int getLEn() { return numericLen; }
-    Level1& operator=(Level1& other);      
+    Level1& operator=(Level1& other);
+    void Attach(IObserver* observer) override {
+        list_observer_.push_back(observer);
+    }
+    void Detach(IObserver* observer) override {
+        list_observer_.remove(observer);
+    }
+    void Notify() override {
+        std::list<IObserver*>::iterator iterator = list_observer_.begin();
+        HowManyObserver();
+        while (iterator != list_observer_.end()) {
+            (*iterator)->Update(message_);
+            ++iterator;
+        }
+    }
+
+    void CreateMessage(std::string message = "Empty") {
+        this->message_ = message;
+        Notify();
+    }
+    void HowManyObserver() {
+        list_observer_.size();
+    }
 };
 Level1::Level1(int Arg[], char Act[], int count) {
     Arguments = new int[count];
@@ -111,8 +153,10 @@ void Level1::Resolve(int actCount) {
 }
 bool Level1::AnswerCheck(int zn) {
     Resolve(oCount);
-    if (searchI == zn)
+    if (searchI == zn) {
+        Notify();
         return 1;
+    }
     else
         return 0;
 }
@@ -148,6 +192,7 @@ Level1& Level1::operator=(Level1& another) { //присваивание
     Actions = another.Actions;
     oCount = another.oCount;
 }
+
 
 // Глобальные переменные:
 HINSTANCE hInst;                                // текущий экземпляр
@@ -267,6 +312,75 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 int mass[5] = { 1,1,1,1 };
 char str[4] = { '+','+','+' };
 Level1 First(mass, str, 4);
+class rebuild
+{
+private:
+    static rebuild* event;
+    rebuild() {}
+public:
+    static rebuild* getInstance() {
+        if (event == nullptr)
+            event = new rebuild();
+        return event;
+    }
+    void doIt()
+    {
+        int i = rand() % 6 + 2 + 2 * mode;
+        int* mas = new int[i];
+        char* ac = new char[i - 1];
+        for (int j = 0; j < i - 1; j++)
+        {
+            mas[j] = rand() % (10 + 40 * mode) + 1 + 9 * mode;
+            int act = rand() % 2;
+            switch (act) {
+            case 0: ac[j] = '+'; break;
+            case 1: ac[j] = '-'; break;
+            }
+
+        }
+        mas[i - 1] = rand() % (10 + 40 * mode) + 1 + 9 * mode;
+        Level1 Second(mas, ac, i);
+        First = Second;
+        rez = -1;
+        help = 0;
+        curEnt = 0;
+        zn = 0;
+    }
+};
+rebuild* rebuild::event;
+rebuild *Builder=rebuild::getInstance();
+
+class Observer : public IObserver {
+public:
+    Observer(Level1& subject) : subject_(subject) {
+        this->subject_.Attach(this);
+        ++Observer::static_number_;
+        this->number_ = Observer::static_number_;
+    }
+    virtual ~Observer() {
+
+    }
+
+    void Update(const std::string& message_from_subject) override {
+        message_from_subject_ = message_from_subject;
+        Builder->doIt();
+
+    }
+    void RemoveMeFromTheList() {
+        subject_.Detach(this);
+
+    }
+
+
+private:
+    std::string message_from_subject_;
+    Level1& subject_;
+    static int static_number_;
+    int number_;
+};
+
+int Observer::static_number_ = 0;
+Observer* observer1 = new Observer(First);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     srand(time(NULL));
@@ -375,6 +489,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             rez = (int)First.AnswerCheck(curEnt);
             if (curEnt < 0)
                 curEnt *= -1;
+            if (rez == 1)
+                rez = -1;
             break;
         case VK_BACK:
             if (!curEnt)
@@ -383,26 +499,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
         case VK_SPACE:     
         {
-            int i = rand() % 6 + 2+2*mode;
-            int* mas = new int[i];
-            char* ac = new char[i - 1];
-            for (int j = 0; j < i - 1; j++)
-            {
-                mas[j] = rand() % (10+40*mode) + 1 + 9 * mode;
-                int act = rand() % 2;
-                switch (act) {
-                case 0: ac[j] = '+'; break;
-                case 1: ac[j] = '-'; break;
-                }
-
-            }
-            mas[i - 1] = rand() % (10 + 40 * mode) + 1 + 9 * mode;
-            Level1 Second(mas, ac, i);
-            First = Second;
-            rez = -1;
-            help = 0;
-            curEnt = 0;
-            zn = 0;
+            Builder->doIt();
         }
             break;
         case VK_F2:

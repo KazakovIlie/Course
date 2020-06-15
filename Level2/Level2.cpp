@@ -143,6 +143,65 @@ Level2& Level2::operator=(Level2& another) { //присваивание
     oCount = another.oCount;
 }
 
+int mass[5] = { 1,1,1,1 };
+char str[4] = { '*','/','*' };
+Level2 First(mass, str, 4);
+
+class GUI
+{
+    HWND hwnd;
+    PAINTSTRUCT ps;
+    HDC hdc;
+    HBRUSH hBrush;
+    public:
+        GUI(HWND hWnd)
+        {
+            hwnd = hWnd;
+            hdc = BeginPaint(hwnd, &ps);
+            hBrush = CreateSolidBrush(RGB(0, 0, 0));
+        }
+        void place()
+        {
+            
+             
+            
+            TextOut(hdc, 800, 100, _T("Easy    Hard"), 12);
+            Rectangle(hdc, 800, 125, 850, 150);
+            Rectangle(hdc, 800 + 50, 125, 850 + 50, 150);
+            
+            SelectObject(hdc, hBrush);
+            Rectangle(hdc, 800 + 50 * (int)mode, 125, 850 + 50 * (int)mode, 150);
+            
+            First.DisplayProblem(hdc);
+            if (help)
+                First.ShowAnswer(hdc);
+            _TCHAR tmp[10];
+            int tmpLen = convi(curEnt, tmp);
+            if (zn)
+                TextOut(hdc, 100 + First.getLEn() * 8, 100, _T("-"), 1);
+            TextOut(hdc, 108 + First.getLEn() * 8, 100, tmp, tmpLen);
+            if (rez == 1)
+                TextOut(hdc, 100 + First.getLEn() * 8 + 55, 100, _T("Accepted!"), 9);
+            else
+                if (rez == 0)
+                    TextOut(hdc, 100 + First.getLEn() * 8 + 85, 100, _T("False!"), 6);
+                else
+                    TextOut(hdc, 100 + First.getLEn() * 8 + 85, 100, _T("Press ENTER to check your answer!"), 33);
+            TextOut(hdc, 50, 30, _T("Press SPACE to get another example!"), 35);
+            TextOut(hdc, 50, 60, _T("Press F2 to get help!"), 21);
+            TextOut(hdc, 50, 5, _T("Use 0-9,-,+ to write your answer!"), 33);
+            TextOut(hdc, 300, 5, _T("Press BACKSPACE to erase your input!"), 36); 
+        }
+        ~GUI()
+        {
+            EndPaint(hwnd, &ps);
+            DeleteObject(hBrush);
+            delete(hdc);
+            delete(hwnd);
+            
+        }
+
+};
 // Глобальные переменные:
 HINSTANCE hInst;                                // текущий экземпляр
 WCHAR szTitle[MAX_LOADSTRING];                  // Текст строки заголовка
@@ -258,11 +317,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - отправить сообщение о выходе и вернуться
 //
 //
-int mass[5] = { 1,1,1,1 };
-char str[4] = { '*','/','*' };
-Level2 First(mass, str, 4);
+
+GUI* interface;
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    
     srand(time(NULL));
     switch (message)
     {
@@ -428,38 +487,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     break;
     case WM_PAINT:
     {
-        PAINTSTRUCT ps;
-        HDC hdc = BeginPaint(hWnd, &ps);
-        HBRUSH hBrush;
-        TextOut(hdc, 800, 100, _T("Easy    Hard"), 12);
-        Rectangle(hdc, 800, 125, 850, 150);
-        Rectangle(hdc, 800 + 50, 125, 850 + 50, 150);
-        hBrush = CreateSolidBrush(RGB(0, 0, 0));
-        SelectObject(hdc, hBrush);
-        Rectangle(hdc, 800 + 50 * (int)mode, 125, 850 + 50 * (int)mode, 150);
-        DeleteObject(hBrush);
-        First.DisplayProblem(hdc);
-        if (help)
-            First.ShowAnswer(hdc);
-        _TCHAR tmp[10];
-        int tmpLen = convi(curEnt, tmp);
-        if (zn)
-            TextOut(hdc, 100 + First.getLEn() * 8, 100, _T("-"), 1);
-        TextOut(hdc, 108 + First.getLEn() * 8, 100, tmp, tmpLen);
-        if (rez == 1)
-            TextOut(hdc, 100 + First.getLEn() * 8 + 55, 100, _T("Accepted!"), 9);
-        else
-            if (rez == 0)
-                TextOut(hdc, 100 + First.getLEn() * 8 + 85, 100, _T("False!"), 6);
-            else
-                TextOut(hdc, 100 + First.getLEn() * 8 + 85, 100, _T("Press ENTER to check your answer!"), 33);
-        TextOut(hdc, 50, 30, _T("Press SPACE to get another example!"), 35);
-        TextOut(hdc, 50, 60, _T("Press F2 to get help!"), 21);
-        TextOut(hdc, 50, 5, _T("Use 0-9,-,+ to write your answer!"), 33);
-        TextOut(hdc, 300, 5, _T("Press BACKSPACE to erase your input!"), 36);
-
-        // TODO: Добавьте сюда любой код прорисовки, использующий HDC...
-        EndPaint(hWnd, &ps);
+        interface = new GUI(hWnd);
+        interface->place();
+        
     }
     break;
     case WM_DESTROY:

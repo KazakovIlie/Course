@@ -4,6 +4,7 @@
 #include "framework.h"
 #include "MainFile.h"
 #include "shellapi.h"
+#include <string>
 #define MAX_LOADSTRING 100
 _TCHAR* addres;
 int ll;
@@ -23,6 +24,188 @@ int GetAddres(char Level)
     return len + 12;
 
 }
+
+class PosConvert
+{
+    int xstart;
+    int ystart;
+
+public:
+    PosConvert(int x, int y)
+    {
+        xstart = x;
+        ystart = y;
+    }
+    int XLine(POINT c, int bonus) {
+        return (c.x - xstart) / (8+bonus);
+    }
+    int YLine(POINT c, int bonus) {
+        return (c.y - ystart) / (16+bonus);
+    }
+};
+
+class BaseLevel;
+class Mediator {
+public:
+    virtual void Notify(BaseLevel* sender, std::string event) const = 0;
+};
+
+class BaseLevel {
+protected:
+    Mediator* mediator_;
+
+public:
+    BaseLevel(Mediator* mediator = nullptr) : mediator_(mediator) {
+    }
+    void set_mediator(Mediator* mediator) {
+        this->mediator_ = mediator;
+    }
+};
+
+
+class Level1 : public BaseLevel {
+public:
+    void DoA(HWND hWnd) {
+        this->mediator_->Notify(this, "A");
+        _TCHAR* filename;
+        _TCHAR* windowTitle;
+        GetAddres('1');
+        filename = addres;
+        windowTitle = new _TCHAR[5];
+        windowTitle[0] = 's';
+        windowTitle[1] = 't';
+        windowTitle[2] = 'a';
+        windowTitle[3] = 'r';
+        windowTitle[4] = 't';
+        
+        ShellExecute(hWnd, _T("open"), filename, NULL, NULL, SW_SHOW);
+    }
+    void DoB() {
+        HWND hwnd;
+        hwnd = FindWindow(NULL, _T("start"));
+        if (hwnd != NULL)
+        {
+            PostMessage(hwnd, WM_DESTROY, 0, 0);
+        }
+        
+    }
+};
+
+class Level2 : public BaseLevel {
+public:
+    void DoC(HWND hWnd) {
+        this->mediator_->Notify(this, "C");
+
+        _TCHAR* filename;
+        _TCHAR* windowTitle;
+        GetAddres('2');
+        filename = addres;
+        windowTitle = new _TCHAR[6];
+        windowTitle[0] = 'L';
+        windowTitle[1] = 'e';
+        windowTitle[2] = 'v';
+        windowTitle[3] = 'e';
+        windowTitle[4] = 'l';
+        windowTitle[5] = '2';
+        
+        ShellExecute(hWnd, _T("open"), filename, NULL, NULL, SW_SHOW);
+        
+        
+    }
+    void DoD() {
+        HWND hwnd;
+            hwnd = FindWindow(NULL, _T("Level2"));
+            if (hwnd != NULL)
+            {
+                PostMessage(hwnd, WM_DESTROY, 0, 0);
+            }
+      
+       
+    }
+};
+class Level3 : public BaseLevel {
+public:
+    void DoE(HWND hWnd) {
+        this->mediator_->Notify(this, "E");
+        _TCHAR* filename;
+        _TCHAR* windowTitle;
+        GetAddres('3');
+        filename = addres;
+        windowTitle = new _TCHAR[6];
+        windowTitle[0] = 'L';
+        windowTitle[1] = 'e';
+        windowTitle[2] = 'v';
+        windowTitle[3] = 'e';
+        windowTitle[4] = 'l';
+        windowTitle[4] = '3';
+        
+        ShellExecute(hWnd, _T("open"), filename, NULL, NULL, SW_SHOW);
+
+        
+    }
+    void DoF() {
+        HWND hwnd;
+     
+            hwnd = FindWindow(NULL, _T("Level3"));
+            if (hwnd != NULL)
+            {
+                PostMessage(hwnd, WM_DESTROY, 0, 0);
+            }
+       
+        
+    }
+};
+
+
+class ConcreteMediator : public Mediator {
+private:
+    Level1* Level1_;
+    Level2* Level2_;
+    Level3* Level3_;
+
+public:
+    ConcreteMediator(Level1* c1, Level2* c2, Level3* c3) : Level1_(c1), Level2_(c2), Level3_(c3){
+        this->Level1_->set_mediator(this);
+        this->Level2_->set_mediator(this);
+        this->Level3_->set_mediator(this);
+    }
+    void Notify(BaseLevel* sender, std::string event) const override {
+        _TCHAR u = event[0];
+        switch (u) {
+            case 'A':
+                this->Level1_->DoB();
+                this->Level2_->DoD();
+                this->Level3_->DoF();
+                break;
+            case 'B':
+
+                break;
+            case 'C':
+                this->Level1_->DoB();
+                this->Level2_->DoD();
+                this->Level3_->DoF();
+                break;
+            case 'D':
+
+                break;
+            case 'E':
+                this->Level1_->DoB();
+                this->Level2_->DoD();
+                this->Level3_->DoF();
+                break;
+            case 'F':
+
+                break;
+            default:    break;
+        }
+        
+        
+    }
+};
+Level1* c1 = new Level1;
+Level2* c2 = new Level2;
+Level3* c3 = new Level3;
+ConcreteMediator* mediator = new ConcreteMediator(c1, c2, c3);
 // Глобальные переменные:
 HINSTANCE hInst;                                // текущий экземпляр
 WCHAR szTitle[MAX_LOADSTRING];                  // Текст строки заголовка
@@ -164,24 +347,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
 
             ScreenToClient(hWnd, &pt);
-            if (pt.x > 149 && pt.x < 151+47*8 && pt.y>249 && pt.y < 266)
+            PosConvert converter(150,250);
+            switch (converter.YLine(pt, 35))
             {
-                ll = GetAddres('1');
-
-                ShellExecute(hWnd, _T("open"), addres, NULL, NULL, SW_SHOW);
+                case 0:
+                    c1->DoA(hWnd);
+                    break;
+                case 1:
+                    c2->DoC(hWnd);
+                    break;
+                case 2:
+                    c3->DoE(hWnd);
+                    break;
+                default:
+                    break;
             }
-            if (pt.x > 149 && pt.x < 151 + 50 * 8 && pt.y>299 && pt.y < 316)
-            {
-                ll = GetAddres('2');
-
-                ShellExecute(hWnd, _T("open"), addres, NULL, NULL, SW_SHOW);
-            }
-            if (pt.x > 149 && pt.x < 151 + 38 * 8 && pt.y>349 && pt.y < 366)
-            {
-                ll = GetAddres('3');
-
-                ShellExecute(hWnd, _T("open"), addres, NULL, NULL, SW_SHOW);
-            }
+          
             InvalidateRect(hWnd, NULL, true);
         }
         break;
