@@ -314,6 +314,8 @@ char str[4] = { '+','+','+' };
 Level1 First(mass, str, 4);
 class rebuild
 {
+protected:
+    Level1* Second;
 private:
     static rebuild* event;
     rebuild() {}
@@ -323,7 +325,7 @@ public:
             event = new rebuild();
         return event;
     }
-    void doIt()
+    Level1 doIt()
     {
         int i = rand() % 6 + 2 + 2 * mode;
         int* mas = new int[i];
@@ -339,12 +341,13 @@ public:
 
         }
         mas[i - 1] = rand() % (10 + 40 * mode) + 1 + 9 * mode;
-        Level1 Second(mas, ac, i);
-        First = Second;
+         Second=new Level1(mas, ac, i);
+         First = *Second;
         rez = -1;
         help = 0;
         curEnt = 0;
         zn = 0;
+        return *Second;
     }
 };
 rebuild* rebuild::event;
